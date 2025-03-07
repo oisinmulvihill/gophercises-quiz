@@ -5,6 +5,7 @@ import "errors"
 type QuizQuestion struct {
 	Question string
 	Answer   int
+	Response int
 }
 
 type QuizQuestions struct {

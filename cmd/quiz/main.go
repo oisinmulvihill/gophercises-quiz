@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/oisinmulvihill/gophercises-quiz/internal/core"
 	"github.com/oisinmulvihill/gophercises-quiz/internal/quiz"
 	"github.com/oisinmulvihill/gophercises-quiz/internal/settings"
 )
@@ -23,9 +24,14 @@ func main() {
 		} else {
 			log.Fatal(err)
 		}
-		os.Exit(1)
 	}
 
-	quiz.RecoverQuestionsAndAnswers(file)
+	var quizQuestions *core.QuizQuestions
 
+	quizQuestions, err = quiz.RecoverQuestionsAndAnswers(file)
+	if err != nil {
+		log.Fatalf("Failed to recover questions and answers: %v", err)
+	}
+
+	quiz.RunQuizGame(quizQuestions)
 }
