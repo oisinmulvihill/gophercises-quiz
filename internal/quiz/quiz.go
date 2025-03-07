@@ -6,20 +6,13 @@ import (
 	"io"
 	"log"
 	"strconv"
+
+	"github.com/oisinmulvihill/gophercises-quiz/internal/core"
 )
 
-type QuizQuestion struct {
-	Question string
-	Answer   int
-}
+func RecoverQuestionsAndAnswers(source io.Reader) (*core.QuizQuestions, error) {
 
-type QuizQuestions struct {
-	Questions []QuizQuestion
-}
-
-func RecoverQuizQuestions(source io.Reader) (*QuizQuestions, error) {
-
-	quizQuestionsAndAnswers := QuizQuestions{}
+	quizQuestionsAndAnswers := core.QuizQuestions{}
 
 	reader := csv.NewReader(source)
 	for {
@@ -34,12 +27,12 @@ func RecoverQuizQuestions(source io.Reader) (*QuizQuestions, error) {
 
 		answer, err := strconv.Atoi(record[1])
 		if err != nil {
-			err = fmt.Errorf("cannot convert answer to integer: '%v' for question: %s", record[1], record[0])
-			log.Fatal(err)
-			return &quizQuestionsAndAnswers, err
+			errorMessage := fmt.Errorf("cannot convert answer to integer '%v' for question '%s' because %w", record[1], record[0], err)
+			log.Println(errorMessage)
+			return &quizQuestionsAndAnswers, fmt.Errorf("%s: %w", errorMessage, core.ErrAnswerNotAnInteger)
 		}
 
-		QuizQuestion := QuizQuestion{
+		QuizQuestion := core.QuizQuestion{
 			Question: record[0],
 			Answer:   answer,
 		}

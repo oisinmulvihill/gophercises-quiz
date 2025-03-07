@@ -26,6 +26,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	quiz.RecoverQuizQuestions(file)
+	quiz.RecoverQuestionsAndAnswers(file)
 
 }

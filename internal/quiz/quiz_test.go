@@ -1,16 +1,19 @@
 package quiz
 
 import (
+	"errors"
 	"strings"
 	"testing"
+
+	"github.com/oisinmulvihill/gophercises-quiz/internal/core"
 )
 
-func TestRecoverQuizQuestions(t *testing.T) {
+func TestRecoverQuestionsAndAnswers(t *testing.T) {
 
 	source := strings.NewReader(`5+5,10
 7+7,14`)
 
-	quizQuestions, err := RecoverQuizQuestions(source)
+	quizQuestions, err := RecoverQuestionsAndAnswers(source)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -34,11 +37,11 @@ func TestRecoverQuizQuestions(t *testing.T) {
 	}
 }
 
-func TestRecoverQuizQuestionsNoRows(t *testing.T) {
+func TestRecoverQuestionsAndAnswersNoRows(t *testing.T) {
 
 	source := strings.NewReader("")
 
-	quizQuestions, err := RecoverQuizQuestions(source)
+	quizQuestions, err := RecoverQuestionsAndAnswers(source)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -47,15 +50,12 @@ func TestRecoverQuizQuestionsNoRows(t *testing.T) {
 		t.Errorf("expected 0 questions but got %d", len(quizQuestions.Questions))
 	}
 }
-func TestRecoverQuizQuestionsAnswerFailedToConvertToInt(t *testing.T) {
-
+func TestRecoverQuestionsAndAnswersAnswerFailedToConvertToInt(t *testing.T) {
 	source := strings.NewReader("2+2,a")
 
-	_, err := RecoverQuizQuestions(source)
+	_, err := RecoverQuestionsAndAnswers(source)
 
-	expectedError := "cannot convert answer to integer: 'a' for question: 2+2"
-
-	if err.Error() != expectedError {
-		t.Errorf("unexpected error: %v", err)
+	if !errors.Is(err, core.ErrAnswerNotAnInteger) {
+		t.Errorf("Expected error: %+v, got: %+v", core.ErrAnswerNotAnInteger, err)
 	}
 }
