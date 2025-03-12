@@ -8,8 +8,13 @@ type QuizQuestion struct {
 	Response int
 }
 
+type QuestionAnswer struct {
+	QuestionNumber int
+	Answer         int
+}
+
 type QuizQuestions struct {
-	Questions []QuizQuestion
+	Questions []*QuizQuestion
 }
 
 var ErrAnswerNotAnInteger = errors.New("answer is not an integer")

@@ -6,6 +6,7 @@ import (
 
 type configuration struct {
 	QuizQuestionsFile string
+	TimeOut           int
 }
 
 func Recover(arguments []string) *configuration {

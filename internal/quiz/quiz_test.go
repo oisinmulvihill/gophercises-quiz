@@ -59,3 +59,41 @@ func TestRecoverQuestionsAndAnswersAnswerFailedToConvertToInt(t *testing.T) {
 		t.Errorf("Expected error: %+v, got: %+v", core.ErrAnswerNotAnInteger, err)
 	}
 }
+
+func TestResults(t *testing.T) {
+	quizQuestions := core.QuizQuestions{
+		Questions: []*core.QuizQuestion{
+			{
+				Question: "What is 2 + 2?",
+				Answer:   4, // expected ansert
+				Response: 4, // user given answer
+			},
+			{
+				Question: "What is 3 + 5?",
+				Answer:   8,
+				Response: 7, // wrong answer given
+			},
+		},
+	}
+
+	correctAnswers, incorrectAnswers := Results(&quizQuestions)
+	if correctAnswers != 1 {
+		t.Errorf("expected 1 correct answer but got %d", correctAnswers)
+	}
+	if incorrectAnswers != 1 {
+		t.Errorf("expected 1 incorrect answer but got %d", incorrectAnswers)
+	}
+}
+func TestResultsNoResults(t *testing.T) {
+	quizQuestions := core.QuizQuestions{
+		Questions: []*core.QuizQuestion{},
+	}
+
+	correctAnswers, incorrectAnswers := Results(&quizQuestions)
+	if correctAnswers != 0 {
+		t.Errorf("expected 0 correct answer but got %d", correctAnswers)
+	}
+	if incorrectAnswers != 0 {
+		t.Errorf("expected 0 incorrect answer but got %d", incorrectAnswers)
+	}
+}

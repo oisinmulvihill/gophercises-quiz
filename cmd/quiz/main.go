@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/oisinmulvihill/gophercises-quiz/internal/core"
 	"github.com/oisinmulvihill/gophercises-quiz/internal/quiz"
@@ -27,11 +29,33 @@ func main() {
 	}
 
 	var quizQuestions *core.QuizQuestions
+	answerChannel := make(chan core.QuestionAnswer)
 
 	quizQuestions, err = quiz.RecoverQuestionsAndAnswers(file)
 	if err != nil {
 		log.Fatalf("Failed to recover questions and answers: %v", err)
 	}
 
-	quiz.RunQuizGame(quizQuestions)
+	go quiz.RunQuizGame(quizQuestions, answerChannel)
+
+game:
+	for {
+		select {
+		case response := <-answerChannel:
+			if response.QuestionNumber == -1 {
+				fmt.Println("Quiz complete!")
+				break game
+			} else {
+				q := quizQuestions.Questions[response.QuestionNumber]
+				q.Response = response.Answer
+			}
+
+		case <-time.After(10 * time.Second):
+			log.Println("Time's up!")
+			break game
+		}
+	}
+
+	correctAnswers, incorrectAnswers := quiz.Results(quizQuestions)
+	fmt.Printf("You got %d correct answers and %d incorrect answers\n", correctAnswers, incorrectAnswers)
 }

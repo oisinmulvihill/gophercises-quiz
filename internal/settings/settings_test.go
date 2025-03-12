@@ -24,3 +24,12 @@ func TestRecoverDefaultFilename(t *testing.T) {
 		t.Errorf("expected 'problems.csv' but got '%s'", config.QuizQuestionsFile)
 	}
 }
+func TestRecoverTimeOut(t *testing.T) {
+	args := []string{"-timeout", "10"}
+
+	config := Recover(args)
+
+	if config.TimeOut != 10 {
+		t.Errorf("expected '10' TimeOut but got '%v'", config.TimeOut)
+	}
+}
