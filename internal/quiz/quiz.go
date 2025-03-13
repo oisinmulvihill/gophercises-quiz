@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -13,7 +14,7 @@ import (
 	"github.com/oisinmulvihill/gophercises-quiz/internal/core"
 )
 
-func RecoverQuestionsAndAnswers(source io.Reader) (*core.QuizQuestions, error) {
+func RecoverQuestionsAndAnswers(source io.Reader, shuffle bool) (*core.QuizQuestions, error) {
 
 	quizQuestionsAndAnswers := core.QuizQuestions{}
 
@@ -40,7 +41,14 @@ func RecoverQuestionsAndAnswers(source io.Reader) (*core.QuizQuestions, error) {
 			Answer:   answer,
 		}
 		quizQuestionsAndAnswers.Questions = append(quizQuestionsAndAnswers.Questions, &QuizQuestion)
-		log.Printf("New question '%s' & answer '%d' recovered", QuizQuestion.Question, QuizQuestion.Answer)
+		// log.Printf("New question '%s' & answer '%d' recovered", QuizQuestion.Question, QuizQuestion.Answer)
+	}
+
+	if shuffle {
+		fmt.Println("Shuffling questions...")
+		rand.Shuffle(len(quizQuestionsAndAnswers.Questions), func(i, j int) {
+			quizQuestionsAndAnswers.Questions[i], quizQuestionsAndAnswers.Questions[j] = quizQuestionsAndAnswers.Questions[j], quizQuestionsAndAnswers.Questions[i]
+		})
 	}
 
 	return &quizQuestionsAndAnswers, nil
@@ -58,9 +66,11 @@ func getAnswerToQuestion(question *core.QuizQuestion, buffer *bufio.Reader) (int
 		return 0, err
 	}
 
-	value, err = strconv.Atoi(strings.TrimSpace(numberText))
+	input := strings.TrimSpace(numberText)
+	value, err = strconv.Atoi(input)
 	if err != nil {
-		return 0, err
+		fmt.Printf("Failed to convert '%s' to a number. The answer is incorrect!\n", input)
+		return -1, nil
 	}
 
 	return value, nil

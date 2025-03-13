@@ -13,7 +13,7 @@ func TestRecoverQuestionsAndAnswers(t *testing.T) {
 	source := strings.NewReader(`5+5,10
 7+7,14`)
 
-	quizQuestions, err := RecoverQuestionsAndAnswers(source)
+	quizQuestions, err := RecoverQuestionsAndAnswers(source, false)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -41,7 +41,7 @@ func TestRecoverQuestionsAndAnswersNoRows(t *testing.T) {
 
 	source := strings.NewReader("")
 
-	quizQuestions, err := RecoverQuestionsAndAnswers(source)
+	quizQuestions, err := RecoverQuestionsAndAnswers(source, false)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -53,7 +53,7 @@ func TestRecoverQuestionsAndAnswersNoRows(t *testing.T) {
 func TestRecoverQuestionsAndAnswersAnswerFailedToConvertToInt(t *testing.T) {
 	source := strings.NewReader("2+2,a")
 
-	_, err := RecoverQuestionsAndAnswers(source)
+	_, err := RecoverQuestionsAndAnswers(source, false)
 
 	if !errors.Is(err, core.ErrAnswerNotAnInteger) {
 		t.Errorf("Expected error: %+v, got: %+v", core.ErrAnswerNotAnInteger, err)

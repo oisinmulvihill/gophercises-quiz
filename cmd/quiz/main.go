@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -31,10 +32,15 @@ func main() {
 	var quizQuestions *core.QuizQuestions
 	answerChannel := make(chan core.QuestionAnswer)
 
-	quizQuestions, err = quiz.RecoverQuestionsAndAnswers(file)
+	quizQuestions, err = quiz.RecoverQuestionsAndAnswers(file, config.Shuffle)
 	if err != nil {
 		log.Fatalf("Failed to recover questions and answers: %v", err)
 	}
+
+	fmt.Printf("You will have %d seconds to complete the quiz, once you press return to begin.\n", config.TimeOut)
+	bufio.NewReader(os.Stdin).ReadString('\n')
+
+	timeoutChannel := time.After(time.Duration(config.TimeOut) * time.Second)
 
 	go quiz.RunQuizGame(quizQuestions, answerChannel)
 
@@ -50,12 +56,12 @@ game:
 				q.Response = response.Answer
 			}
 
-		case <-time.After(10 * time.Second):
+		case <-timeoutChannel:
 			log.Println("Time's up!")
 			break game
 		}
 	}
 
 	correctAnswers, incorrectAnswers := quiz.Results(quizQuestions)
-	fmt.Printf("You got %d correct answers and %d incorrect answers\n", correctAnswers, incorrectAnswers)
+	fmt.Printf("You got %d correct answers out of a total of %d\n", correctAnswers, correctAnswers+incorrectAnswers)
 }
